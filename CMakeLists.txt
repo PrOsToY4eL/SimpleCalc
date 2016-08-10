@@ -1,0 +1,5 @@
+cmake_minimum_required (VERSION 2.8)
+set( ProjectName SimpleCalc )
+project( ${ProjectName} )
+file(GLOB AUTO_SOURCES "*.h" "*.cpp")
+add_executable( ${ProjectName} 	${AUTO_SOURCES})
