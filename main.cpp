@@ -1,26 +1,32 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include "Expression.h"
 int main()
 {
 	setlocale(0, "");
-	auto expression{ std::make_unique<Expression>() };
-	while(true)
+	std::cout << "SimpleCalc by PrOsToY_4eL v0.1.1 " << std::endl;
+	auto expression{ std::make_unique<Expression>(*new Expression{}) };
+	while (true)
 	{
 		try
 		{
 			std::cin >> *expression;
 			expression->parse();
 			expression->getRpnData();
-			expression->getResult();
+			expression->getAns();
 			std::cout << *expression;
 		}
 		catch (const Expression::exceptionClassError &exc)
 		{
-			std::cout << "Âíèìàíèå! " << exc.errorMsg;
+			std::cout << "Ð’Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ! " << exc.errorMsg;
 		}
 		catch (const Expression::exceptionClassExit&)
 		{
-			std::cout << "Âû íè÷åãî íå ââåëè è íàæàëè Enter.\n";
+			std::cout << "Ð’Ñ‹ Ð½Ð¸Ñ‡ÐµÐ³Ð¾ Ð½Ðµ Ð²Ð²ÐµÐ»Ð¸ Ð¸ Ð½Ð°Ð¶Ð°Ð»Ð¸ Enter.\n";
+			break;
+		}
+		catch (...)
+		{
+			std::cerr << "ÐÐµÐ¸Ð·ÐµÑÐ½Ð°Ñ Ð¾ÑˆÐ¸Ð±ÐºÐ°";
 			break;
 		}
 	}

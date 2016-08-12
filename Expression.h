@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <vector>
 #include <string>
 #include <iostream>
@@ -10,28 +10,29 @@
 class Expression
 {
 private:
-	std::string inputData;
-	std::vector<std::shared_ptr<SimpleElement>> processedInputData;
-	std::vector<std::shared_ptr<SimpleElement>> rpnProcessedInputData;
-	long double finalResult;
+	std::string inputExpression;
+	std::vector<std::shared_ptr<SimpleElement>> processedInputExpression;
+	std::vector<std::shared_ptr<SimpleElement>> rpnProcessedInputExpression;
+	long double ans;
 public:
 	class exceptionClassError
 	{
 	public:
 		std::string errorMsg;
-		explicit exceptionClassError() :errorMsg("Íåèçâåñòíàÿ îøèáêà.\n") {}
-		explicit exceptionClassError(std::string err) :errorMsg(err) {}
+		explicit exceptionClassError() :errorMsg{ "ÐÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ð°Ñ Ð¾ÑˆÐ¸Ð±ÐºÐ°.\n" } {}
+		explicit exceptionClassError(const std::string &err) :errorMsg{ err } {}
 	};
 	class exceptionClassExit
 	{
 	public:
-		exceptionClassExit() {}
+		explicit exceptionClassExit() = default;
 	};
-	Expression() = default;
+	explicit Expression() = default;
 	void parse();
 	void getRpnData();
-	void getResult();
+	void getAns();
 	void clear();
 	friend std::istream& operator>>(std::istream &input, Expression &expression_object);
 	friend std::ostream& operator<<(std::ostream &output, Expression &expression_object);
+	~Expression() = default;
 };

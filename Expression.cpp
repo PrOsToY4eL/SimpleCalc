@@ -1,4 +1,4 @@
-#include "Expression.h"
+п»ї#include "Expression.h"
 void Expression::parse()
 {
 	enum class PartOfNumber { Integer, Fraction } partOfNumber{ PartOfNumber::Integer };
@@ -7,65 +7,93 @@ void Expression::parse()
 	auto currentNumber{ 0.0 };
 	auto insertNumber{ false };
 	auto lastSymbol{ '\0' };
-	for (const auto &s : inputData)
+	std::string ansStr{};
+	for (const auto &symbol : inputExpression)
 	{
-		if (s == ' ')
+		switch (symbol)
+		{
+		case 'a':
+			if (ansStr.empty())
+				ansStr += symbol;
 			continue;
-		if (s >= '0' && s <= '9')
+			break;
+		case 'n':
+			if (ansStr == "a")
+				ansStr += symbol;
+			continue;
+			break;
+		case 's':
+			if (ansStr == "an")
+			{
+				ansStr.clear();
+				processedInputExpression.push_back(std::make_shared<Number>(*new Number{ this->ans }));
+			}
+			continue;
+			break;
+		default:
+			break;
+		}
+
+		if (symbol == ' ')
+			continue;
+		if (symbol >= '0' && symbol <= '9')
 		{
 			if (partOfNumber == PartOfNumber::Integer)
-				currentNumber = currentNumber*base + s - 48;
+				currentNumber = currentNumber*base + symbol - 48;
 			else
-				currentNumber += (s - 48.) / baseWeight;
+				currentNumber += (symbol - 48.) / baseWeight;
 			baseWeight *= base;
 			insertNumber = true;
 		}
-		else if (s == '.' || s == ',')
+		else if (symbol == '.' || symbol == ',')
 		{
 			partOfNumber = PartOfNumber::Fraction;
 			baseWeight = base;
 		}
-		else if (s == '+' || s == '-' || s == '*'
-			|| s == '/' || s == '^' || s == '!')
+		else if (symbol == '+' || symbol == '-' || symbol == '*'
+			|| symbol == '/' || symbol == '^' || symbol == '!')
 		{
 			if (insertNumber == true)
 			{
-				processedInputData.push_back(std::make_shared<Number>(Number{ currentNumber }));
+				processedInputExpression.push_back(std::make_shared<Number>(*new Number{ currentNumber }));
 				partOfNumber = PartOfNumber::Integer;
 				currentNumber = 0.0;
 				baseWeight = 1;
 				insertNumber = false;
 			}
-			if ((processedInputData.empty() || lastSymbol == '(') && (s == '+' || s == '-') || s == '^')
-				processedInputData.push_back(std::make_shared<Symbol>(Symbol{ s, SimpleElement::Fixity::right }));
-			else processedInputData.push_back(std::make_shared<Symbol>(Symbol{ s, SimpleElement::Fixity::left }));
+			if ((processedInputExpression.empty() || lastSymbol == '(') && (symbol == '+' || symbol == '-'))
+				processedInputExpression.push_back(std::make_shared<Symbol>(*new Symbol{ symbol, SimpleElement::Arity::Unary, SimpleElement::Fixity::Right }));
+			else if (symbol == '^')
+				processedInputExpression.push_back(std::make_shared<Symbol>(*new Symbol{ symbol, SimpleElement::Arity::Binary, SimpleElement::Fixity::Right }));
+			else
+				processedInputExpression.push_back(std::make_shared<Symbol>(*new Symbol{ symbol, SimpleElement::Arity::Binary, SimpleElement::Fixity::Left }));
 		}
-		else if (s == '(' || s == ')')
+		else if (symbol == '(' || symbol == ')')
 		{
 			if (insertNumber == true)
 			{
-				processedInputData.push_back(std::make_shared<Number>(Number{ currentNumber }));
+				processedInputExpression.push_back(std::make_shared<Number>(*new Number{ currentNumber }));
 				partOfNumber = PartOfNumber::Integer;
 				currentNumber = 0.0;
 				baseWeight = 1;
 				insertNumber = false;
 			}
-			processedInputData.push_back(std::make_shared<Symbol>(Symbol{ s, SimpleElement::Fixity::right }));
+			processedInputExpression.push_back(std::make_shared<Symbol>(*new Symbol{ symbol, SimpleElement::Arity::Nullary, SimpleElement::Fixity::Right }));
 		}
-		else throw exceptionClassError{ "Входные данные не корректны!\n" };
-		lastSymbol = s;
+		else throw exceptionClassError{ "Р’С…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ РЅРµ РєРѕСЂСЂРµРєС‚РЅС‹!\n" };
+		lastSymbol = symbol;
 	}
 	if (insertNumber == true)
-		processedInputData.push_back(std::make_shared<Number>(Number{ currentNumber }));
+		processedInputExpression.push_back(std::make_shared<Number>(*new Number{ currentNumber }));
 }
 void Expression::getRpnData()
 {
 	std::stack<std::shared_ptr<SimpleElement>> rpnStack;
-	for (const auto &element : processedInputData)
+	for (const auto &element : processedInputExpression)
 	{
 		if (!element->isSymbol())
 		{
-			rpnProcessedInputData.push_back(element);
+			rpnProcessedInputExpression.push_back(element);
 			continue;
 		}
 		if (element->getSymbolValue() == '(')
@@ -77,7 +105,7 @@ void Expression::getRpnData()
 		{
 			while (!rpnStack.empty() && rpnStack.top()->getSymbolValue() != '(')
 			{
-				rpnProcessedInputData.push_back(rpnStack.top());
+				rpnProcessedInputExpression.push_back(rpnStack.top());
 				rpnStack.pop();
 			}
 			if (!rpnStack.empty())
@@ -85,20 +113,20 @@ void Expression::getRpnData()
 				rpnStack.pop();
 				if (!rpnStack.empty() && !rpnStack.top()->isSymbol())
 				{
-					rpnProcessedInputData.push_back(rpnStack.top());
+					rpnProcessedInputExpression.push_back(rpnStack.top());
 					rpnStack.pop();
 				}
 				continue;
 			}
-			else throw exceptionClassError{ "Неверно поставлен разделитель или не согласованы скобки.\n" };
+			else throw exceptionClassError{ "РќРµРІРµСЂРЅРѕ РїРѕСЃС‚Р°РІР»РµРЅ СЂР°Р·РґРµР»РёС‚РµР»СЊ РёР»Рё РЅРµ СЃРѕРіР»Р°СЃРѕРІР°РЅС‹ СЃРєРѕР±РєРё.\n" };
 		}
 		if (element->isSymbol())
 		{
 			while (!rpnStack.empty()
-				&& (element->getFixity() == SimpleElement::Fixity::right && element->priority() < rpnStack.top()->priority()
-					|| element->getFixity() == SimpleElement::Fixity::left && element->priority() <= rpnStack.top()->priority()))
+					&& (element->getFixity() == SimpleElement::Fixity::Right && element->priority() < rpnStack.top()->priority()
+					|| element->getFixity() == SimpleElement::Fixity::Left && element->priority() <= rpnStack.top()->priority()))
 			{
-				rpnProcessedInputData.push_back(rpnStack.top());
+				rpnProcessedInputExpression.push_back(rpnStack.top());
 				rpnStack.pop();
 			}
 			rpnStack.push(element);
@@ -107,98 +135,101 @@ void Expression::getRpnData()
 	}
 	while (!rpnStack.empty())
 	{
-		if (rpnStack.top()->isSymbol())
+		if (rpnStack.top()->isSymbol() && rpnStack.top()->getArity() != SimpleElement::Arity::Nullary)
 		{
-			rpnProcessedInputData.push_back(rpnStack.top());
+			rpnProcessedInputExpression.push_back(rpnStack.top());
 			rpnStack.pop();
 		}
-		else throw exceptionClassError{ "Не согласованы скобки.\n" };
+		else throw exceptionClassError{ "РќРµ СЃРѕРіР»Р°СЃРѕРІР°РЅС‹ СЃРєРѕР±РєРё.\n" };
 	}
 }
-void Expression::getResult()
+void Expression::getAns()
 {
 	std::stack<std::shared_ptr<SimpleElement>> stack;
-	for (const auto &element : rpnProcessedInputData)
+	if (rpnProcessedInputExpression.empty())
+		throw exceptionClassError{ "РџСѓСЃС‚РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ\n" };
+	for (const auto &element : rpnProcessedInputExpression)
 	{
 		if (!element->isSymbol())
 		{
 			stack.push(element);
 			continue;
 		}
+		if (element->getArity() == SimpleElement::Arity::Unary && stack.empty() ||
+			element->getArity() == SimpleElement::Arity::Binary && stack.size() < 2)
+			throw exceptionClassError{ "РћС€РёР±РєР° РІ РІС‹СЂР°Р¶РµРЅРёРё!\n" };
 		switch (element->getSymbolValue())
 		{
 		case '+':
 		{
-			if (element->getFixity() == SimpleElement::Fixity::left)
+			auto a = stack.top()->getNumberValue(); stack.pop();
+			if (element->getArity() == SimpleElement::Arity::Binary)
 			{
-				auto a = stack.top()->getNumberValue(); stack.pop();
 				auto b = stack.top()->getNumberValue();	stack.pop();
-				stack.push(std::make_shared<Number>(Number{ b + a }));
+				stack.push(std::make_shared<Number>(*new Number{ b + a }));
 			}
+			else
+				stack.push(std::make_shared<Number>(*new Number{ a }));
 			break;
 		}
 		case '-':
 		{
-			if (element->getFixity() == SimpleElement::Fixity::left)
+			auto a = stack.top()->getNumberValue();	stack.pop();
+			if (element->getArity() == SimpleElement::Arity::Binary)
 			{
-				auto a = stack.top()->getNumberValue();	stack.pop();
 				auto b = stack.top()->getNumberValue();	stack.pop();
-				stack.push(std::make_shared<Number>(Number{ b - a }));
+				stack.push(std::make_shared<Number>(*new Number{ b - a }));
 			}
 			else
-			{
-				auto a = stack.top()->getNumberValue(); stack.pop();
-				stack.push(std::make_shared<Number>(Number{ -a }));
-			}
+				stack.push(std::make_shared<Number>(*new Number{ -a }));
 			break;
 		}
 		case '*':
 		{
 			auto a = stack.top()->getNumberValue(); stack.pop();
 			auto b = stack.top()->getNumberValue();	stack.pop();
-			stack.push(std::make_shared<Number>(Number{ b * a }));
+			stack.push(std::make_shared<Number>(*new Number{ b * a }));
 			break;
 		}
 		case '/':
 		{
 			auto a = stack.top()->getNumberValue();	stack.pop();
 			auto b = stack.top()->getNumberValue();	stack.pop();
-			stack.push(std::make_shared<Number>(Number{ b / a }));
+			stack.push(std::make_shared<Number>(*new Number{ b / a }));
 			break;
 		}
 		case '^':
 		{
 			auto a = stack.top()->getNumberValue(); stack.pop();
 			auto b = stack.top()->getNumberValue();	stack.pop();
-			stack.push(std::make_shared<Number>(Number{ pow(b, a) }));
+			stack.push(std::make_shared<Number>(*new Number{ pow(b, a) }));
 			break;
 		}
 		default:
-			throw exceptionClassError{ "Неизвесный оператор.\n" };
+			throw exceptionClassError{ "РќРµРёР·РІРµСЃРЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ.\n" };
 		}
 	}
-	finalResult = stack.top()->getNumberValue();
+	ans = stack.top()->getNumberValue();
 }
 
 void Expression::clear()
 {
-	this->finalResult = 0;
-	this->inputData.clear();
-	this->processedInputData.clear();
-	this->rpnProcessedInputData.clear();
+	this->inputExpression.clear();
+	this->processedInputExpression.clear();
+	this->rpnProcessedInputExpression.clear();
 }
 
 std::istream& operator>>(std::istream &input, Expression &expressionObject)
 {
 	expressionObject.clear();
-	std::cout << "Введите арифметическое выражение: ";
-	getline(input, expressionObject.inputData);
-	if (expressionObject.inputData.empty())
+	std::cout << ">> ";
+	getline(input, expressionObject.inputExpression);
+	if (expressionObject.inputExpression.empty())
 		throw Expression::exceptionClassExit{};
 	return input;
 }
 std::ostream& operator<<(std::ostream &output, Expression &expressionObject)
 {
-	output << "\nРезультат равен: " << expressionObject.finalResult << std::endl;
+	output << "ans = " << expressionObject.ans << std::endl;
 	return output;
 }

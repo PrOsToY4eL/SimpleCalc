@@ -1,14 +1,15 @@
-#pragma once
+﻿#pragma once
 #include "SimpleElement.h"
 class Symbol :
 	public virtual SimpleElement
 {
 private:
 	char value;
-	Fixity associativity;
+	Arity arity;
+	Fixity fixity;
 public:
-	explicit Symbol() = default;
-	explicit Symbol(char val, Fixity assoc) : value(val), associativity(assoc) {}
+	Symbol() = default;
+	Symbol(char val, Arity ar, Fixity fix) : value{ val }, arity{ ar }, fixity { fix } {}
 	char getSymbolValue()const override { return value; }
 	int priority()const override
 	{
@@ -28,6 +29,7 @@ public:
 	}
 	long double getNumberValue()const override { return 0; }
 	bool isSymbol()const override { return true; }
-	Fixity getFixity()const override { return associativity; }
+	Fixity getFixity()const override { return fixity; }
+	Arity getArity()const override { return arity; }
 	virtual ~Symbol() = default;
 };
