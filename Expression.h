@@ -4,31 +4,33 @@
 #include <iostream>
 #include <stack>
 #include <memory>
-#include "SimpleElement.h"
-#include "Number.h"
-#include "Symbol.h"
+#include <iomanip>
+#include "Token.h"
+#include "Operand.h"
+#include "Operation.h"
 class Expression
 {
 private:
 	std::string inputExpression;
-	std::vector<std::shared_ptr<SimpleElement>> processedInputExpression;
-	std::vector<std::shared_ptr<SimpleElement>> rpnProcessedInputExpression;
+	std::vector<std::shared_ptr<Token>> processedInputExpression;
+	std::vector<std::shared_ptr<Token>> rpnProcessedInputExpression;
 	long double ans;
 public:
-	class exceptionClassError
+	struct LogicError :
+		public std::logic_error
 	{
-	public:
-		std::string errorMsg;
-		explicit exceptionClassError() :errorMsg{ "Неизвестная ошибка.\n" } {}
-		explicit exceptionClassError(const std::string &err) :errorMsg{ err } {}
+		explicit LogicError() :logic_error{ "Unknown error.\n" } {}
+		explicit LogicError(const std::string &error) :logic_error{ error } {}
 	};
-	class exceptionClassExit
+	struct Exit :
+		public std::exception
 	{
-	public:
-		explicit exceptionClassExit() = default;
+		explicit Exit() :std::exception{ "Quiting...\n" }{};
 	};
 	explicit Expression() = default;
 	void parse();
+	bool isOperation(const char &symbol);
+	long double stringToDouble(const std::string &string);
 	void getRpnData();
 	void getAns();
 	void clear();

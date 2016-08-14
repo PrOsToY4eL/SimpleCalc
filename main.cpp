@@ -3,7 +3,9 @@
 int main()
 {
 	setlocale(0, "");
-	std::cout << "SimpleCalc by PrOsToY_4eL v0.1.1 " << std::endl;
+	std::cout << "******************************************" << std::endl;
+	std::cout << "***  SimpleCalc by PrOsToY_4eL v0.1.2  ***" << std::endl;
+	std::cout << "******************************************" << std::endl;
 	auto expression{ std::make_unique<Expression>(*new Expression{}) };
 	while (true)
 	{
@@ -15,19 +17,18 @@ int main()
 			expression->getAns();
 			std::cout << *expression;
 		}
-		catch (const Expression::exceptionClassError &exc)
+		catch (const Expression::LogicError &logicError)
 		{
-			std::cout << "Внимание! " << exc.errorMsg;
+			std::cerr << "Warning! " << logicError.what();
 		}
-		catch (const Expression::exceptionClassExit&)
+		catch (const Expression::Exit &exit)
 		{
-			std::cout << "Вы ничего не ввели и нажали Enter.\n";
+			std::clog << exit.what();
 			break;
 		}
 		catch (...)
 		{
-			std::cerr << "Неизесная ошибка";
-			break;
+			std::clog << "Unknown exception.\n";
 		}
 	}
 	system("pause");

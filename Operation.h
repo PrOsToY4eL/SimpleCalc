@@ -1,15 +1,15 @@
 ﻿#pragma once
-#include "SimpleElement.h"
-class Symbol :
-	public virtual SimpleElement
+#include "Token.h"
+class Operation :
+	public virtual Token
 {
 private:
 	char value;
 	Arity arity;
 	Fixity fixity;
 public:
-	Symbol() = default;
-	Symbol(char val, Arity ar, Fixity fix) : value{ val }, arity{ ar }, fixity { fix } {}
+	explicit Operation() = default;
+	explicit Operation(char val, Arity ar, Fixity fix) : value{ val }, arity{ ar }, fixity { fix } {}
 	char getSymbolValue()const override { return value; }
 	int priority()const override
 	{
@@ -31,5 +31,5 @@ public:
 	bool isSymbol()const override { return true; }
 	Fixity getFixity()const override { return fixity; }
 	Arity getArity()const override { return arity; }
-	virtual ~Symbol() = default;
+	virtual ~Operation() = default;
 };

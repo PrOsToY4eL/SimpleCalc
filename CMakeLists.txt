@@ -3,9 +3,9 @@ cmake_minimum_required (VERSION 2.8)
 
 SET(HEADERS
     Expression.h
-    SimpleElement.h
-    Symbol.h
-    Number.h
+    Token.h
+    Operand.h
+    Operation.h
 	)
 
 SET(SOURCE
