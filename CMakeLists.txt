@@ -6,10 +6,12 @@ SET(HEADERS
     Token.h
     Operand.h
     Operation.h
+	AST.h
 	)
 
 SET(SOURCE
     Expression.cpp
+	AST.cpp
     main.cpp
     )
 
