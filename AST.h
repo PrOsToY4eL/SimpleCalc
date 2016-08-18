@@ -1,33 +1,28 @@
 #pragma once
 #include <memory>
-template <typename ValueType>
-struct Node;
+#include "Token.h"
+struct Node
+{
+	std::shared_ptr<Node> left;
+	std::shared_ptr<Node> right;
+	std::shared_ptr<Node> parent;
+	std::shared_ptr<Token> value;
+	explicit Node() = default;
+	explicit Node(const std::shared_ptr<Token> &val, const std::shared_ptr<Node> &l, const std::shared_ptr<Node> &r, const std::shared_ptr<Node> &p)
+		: value{ std::move(val) }
+		, left{ std::move(l) }
+		, right{ std::move(r) }
+		, parent{ std::move(p) }
+	{}
+	~Node() = default;
+};
 
-template <typename ValueType>
 class AST
 {
 private:
-	std::unique_ptr<Node<ValueType>> root;
+	std::shared_ptr<Node> root;
 public:
-	template <typename ValueType>
-	struct Node
-	{
-		std::unique_ptr<Node> left;
-		std::unique_ptr<Node> right;
-		std::unique_ptr<Node> parent;
-		ValueType  value;
-		explicit Node()
-			: left{ nullptr }
-			, right{ nullptr }
-			, parent{ nullptr }
-		{}
-		explicit Node(const ValueType &val)
-			: Node{}
-			, value{ val }
-		{}
-		~Node() = default;
-	};
-	void addNode(std::unique_ptr<Node<ValueType>> &node);
-	AST() = default;
+	void addNode(std::shared_ptr<Node> &node);
+	explicit AST() = default;
 	~AST() = default;
 };

@@ -1,7 +1,6 @@
 #include "AST.h"
 
-template<typename ValueType>
-void AST<ValueType>::addNode(std::unique_ptr<Node<ValueType>> &node)
+void AST::addNode(std::shared_ptr<Node> &node)
 {
 	node->right = std::move(root);
 	root = std::move(node->parent);
