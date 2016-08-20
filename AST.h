@@ -19,9 +19,8 @@ struct Node
 
 class AST
 {
-private:
-	std::shared_ptr<Node> root;
 public:
+	std::shared_ptr<Node> root;
 	void addNode(std::shared_ptr<Node> &node);
 	explicit AST() = default;
 	~AST() = default;

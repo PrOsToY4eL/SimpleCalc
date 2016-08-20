@@ -15,6 +15,7 @@ int main()
 			expression->parse();
 			expression->getRpnData();
 			expression->getAns();
+			expression->getAst();
 			std::cout << *expression;
 		}
 		catch (const Expression::LogicError &logicError)

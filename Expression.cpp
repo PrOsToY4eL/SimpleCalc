@@ -147,6 +147,58 @@ void Expression::getRpnData()
 		else throw LogicError{ "Syntax error: Brackets are not coordinated.\n" };
 	}
 }
+void Expression::getAst()
+{
+	std::stack<std::shared_ptr<Node>> stack;
+	if (rpnProcessedInputExpression.empty())
+		throw LogicError{ "Parsing error: Your input is empty.\n" };
+	for (const auto &element : rpnProcessedInputExpression)
+	{
+		if (!element->isSymbol())
+		{
+			stack.push(std::make_shared<Node>(*new Node{ element, nullptr, nullptr, nullptr }));
+			continue;
+		}
+		if (element->getArity() == Token::Arity::Unary && stack.empty() ||
+			element->getArity() == Token::Arity::Binary && stack.size() < 2)
+			throw LogicError{ "Parsing error: Maybe your input is incorrect.\n" };
+		switch (element->getSymbolValue())
+		{
+		case '+':
+		case '-':
+		{
+			std::shared_ptr<Node> nodeOperation{ new Node{ element, nullptr, nullptr, nullptr } };
+			std::shared_ptr<Node> nodeLeft{ stack.top() }; stack.pop();
+			nodeOperation->left = std::move(nodeLeft);
+			if (element->getArity() == Token::Arity::Binary)
+			{
+				std::shared_ptr<Node> nodeRight{ stack.top() }; stack.pop();
+				nodeOperation->right = std::move(nodeRight);
+			}
+			stack.push(std::move(nodeOperation));
+			break;
+		}
+		case '*':
+		case '/':
+		case '^':
+		{
+			std::shared_ptr<Node> nodeOperation{ new Node{ element, nullptr, nullptr, nullptr } };
+			std::shared_ptr<Node> nodeLeft{ stack.top() }; stack.pop();
+			nodeOperation->left = std::move(nodeLeft);
+			std::shared_ptr<Node> nodeRight{ stack.top() }; stack.pop();
+			nodeOperation->right = std::move(nodeRight);
+			stack.push(std::move(nodeOperation));
+			break;
+		}
+		default:
+			throw LogicError{ "Parsing error: Unknown operation.\n" };
+		}
+	}
+	if (stack.size() != 1)
+		throw LogicError{ "Parsing error: AST error.\n" };
+	ast.root = std::move(stack.top());
+}
+
 void Expression::getAns()
 {
 	std::stack<std::shared_ptr<Token>> stack;
