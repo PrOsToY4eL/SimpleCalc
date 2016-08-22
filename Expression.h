@@ -15,29 +15,29 @@ private:
 	std::string inputExpression;
 	std::vector<std::shared_ptr<Token>> processedInputExpression;
 	std::vector<std::shared_ptr<Token>> rpnProcessedInputExpression;
-	AST ast;
 	long double ans;
 public:
+	AST ast;
 	struct LogicError :
 		public std::logic_error
 	{
 		explicit LogicError() :logic_error{ "Unknown error.\n" } {}
 		explicit LogicError(const std::string &error) :logic_error{ error } {}
 	};
-	struct Exit :
+	struct Quit :
 		public std::exception
 	{
-		explicit Exit() :std::exception{ "Quiting...\n" }{};
+		explicit Quit() :std::exception{ "Quiting...\n" }{};
 	};
 	explicit Expression() = default;
 	void parse();
-	bool isOperation(const char &symbol);
-	long double stringToDouble(const std::string &string);
+	bool isOperation(const char &)const;
+	long double stringToDouble(const std::string &)const;
 	void getRpnData();
 	void getAst();
 	void getAns();
 	void clear();
-	friend std::istream& operator>>(std::istream &input, Expression &expressionObject);
-	friend std::ostream& operator<<(std::ostream &output, Expression &expressionObject);
+	friend std::istream& operator>>(std::istream &, Expression &);
+	friend std::ostream& operator<<(std::ostream &, Expression &);
 	~Expression() = default;
 };

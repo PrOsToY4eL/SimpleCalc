@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <iostream>
 #include "Token.h"
 struct Node
 {
@@ -21,7 +22,10 @@ class AST
 {
 public:
 	std::shared_ptr<Node> root;
-	void addNode(std::shared_ptr<Node> &node);
+	void preOrder(const std::shared_ptr<Node> &)const;
+	void inOrder(const std::shared_ptr<Node> &)const;
+	void postOrder(const std::shared_ptr<Node> &)const;
+	void print(const std::shared_ptr<Node> &)const;
 	explicit AST() = default;
 	~AST() = default;
 };

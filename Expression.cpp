@@ -1,8 +1,8 @@
 ﻿#include "Expression.h"
 void Expression::parse()
 {
-	if (inputExpression.find("exit") != std::string::npos)
-		throw Exit{};
+	if (inputExpression.find("quit") != std::string::npos)
+		throw Quit{};
 	while (inputExpression.find(' ') != std::string::npos)
 		inputExpression.erase(inputExpression.find(' '), 1);
 	std::string tempString{};
@@ -51,7 +51,7 @@ void Expression::parse()
 	}
 }
 
-bool Expression::isOperation(const char& symbol)
+bool Expression::isOperation(const char& symbol)const
 {
 	switch (symbol)
 	{
@@ -67,7 +67,7 @@ bool Expression::isOperation(const char& symbol)
 	}
 }
 
-long double Expression::stringToDouble(const std::string &string)
+long double Expression::stringToDouble(const std::string &string)const
 {
 	auto integerPart{ true };
 	auto number{ 0.L };
@@ -168,12 +168,12 @@ void Expression::getAst()
 		case '-':
 		{
 			std::shared_ptr<Node> nodeOperation{ new Node{ element, nullptr, nullptr, nullptr } };
-			std::shared_ptr<Node> nodeLeft{ stack.top() }; stack.pop();
-			nodeOperation->left = std::move(nodeLeft);
+			std::shared_ptr<Node> nodeRight{ stack.top() }; stack.pop();
+			nodeOperation->right = std::move(nodeRight);
 			if (element->getArity() == Token::Arity::Binary)
 			{
-				std::shared_ptr<Node> nodeRight{ stack.top() }; stack.pop();
-				nodeOperation->right = std::move(nodeRight);
+				std::shared_ptr<Node> nodeLeft{ stack.top() }; stack.pop();
+				nodeOperation->left = std::move(nodeLeft);
 			}
 			stack.push(std::move(nodeOperation));
 			break;
@@ -183,10 +183,10 @@ void Expression::getAst()
 		case '^':
 		{
 			std::shared_ptr<Node> nodeOperation{ new Node{ element, nullptr, nullptr, nullptr } };
-			std::shared_ptr<Node> nodeLeft{ stack.top() }; stack.pop();
-			nodeOperation->left = std::move(nodeLeft);
 			std::shared_ptr<Node> nodeRight{ stack.top() }; stack.pop();
 			nodeOperation->right = std::move(nodeRight);
+			std::shared_ptr<Node> nodeLeft{ stack.top() }; stack.pop();
+			nodeOperation->left = std::move(nodeLeft);
 			stack.push(std::move(nodeOperation));
 			break;
 		}
