@@ -25,3 +25,30 @@ void AST::print(const std::shared_ptr<Node> &node)const
 		std::cout << node->value->getSymbolValue();
 	else std::cout << node->value->getNumberValue();
 }
+
+auto AST::copy(const std::shared_ptr<Node> &node)-> std::shared_ptr<Node>const
+{
+	auto nodeCopy{ node };
+	if (node->left != nullptr)
+		nodeCopy->left = copy(node->left);
+	if (node->right != nullptr)
+		nodeCopy->right = copy(node->right);
+	return nodeCopy;
+}
+
+void AST::simplify(std::shared_ptr<Node> &root)
+{
+	if (root->value->priority() > root->left->value->priority())
+	{
+		std::shared_ptr<Node> newRoot{ std::move(root->right) };
+		newRoot->parent = nullptr;
+		std::shared_ptr<Node> newLeft{ copy(root) };
+		std::shared_ptr<Node> newRight{ copy(root) };
+		newLeft->right = std::move(newRoot->left);
+		newRight->right = std::move(newRoot->right);
+		newRoot->left = std::move(newLeft);
+		newRoot->right = std::move(newRight);
+		this->root = std::move(newRoot);
+	}
+
+}
