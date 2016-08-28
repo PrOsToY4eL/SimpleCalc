@@ -27,7 +27,7 @@ public:
 	void postOrder(const std::shared_ptr<Node> &)const;
 	void print(const std::shared_ptr<Node> &)const;
 	auto copy(const std::shared_ptr<Node> &)->std::shared_ptr<Node>const;
-	void simplify(std::shared_ptr<Node> &root);
+	void simplify(std::shared_ptr<Node> &);
 	explicit AST() = default;
 	~AST() = default;
 };

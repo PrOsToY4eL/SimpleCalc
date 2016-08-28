@@ -73,44 +73,40 @@ auto AST::copy(const std::shared_ptr<Node> &node)-> std::shared_ptr<Node>const
 
 void AST::simplify(std::shared_ptr<Node> &root)
 {
-	if (root->value->isSymbol() && root->left->value->isSymbol())
+	if (root == nullptr)
+		return;
+	if (root->value->isSymbol() && root->left != nullptr && root->left->value->isSymbol())
 		if (root->value->priority() > root->left->value->priority())
 		{
-			std::shared_ptr<Node> newRoot{ copy(root->left) };
-			newRoot->parent.reset();
+			std::shared_ptr<Node> newRoot{ std::make_shared<Node>(*copy(root->left)) };
 			root->left.reset();
 			std::shared_ptr<Node> newLeft{ std::make_shared<Node>(*copy(root)) };
 			std::shared_ptr<Node> newRight{ std::make_shared<Node>(*copy(root)) };
-
+			root.reset();
 			newLeft->left = copy(newRoot->left);
 			newRoot->left.reset();
-
 			newRight->left = copy(newRoot->right);
 			newRoot->right.reset();
-
 			newRoot->left = newLeft;
 			newRoot->right = newRight;
-			this->root = newRoot;
+			root = copy(newRoot);
 		}
-
-	if (root->value->isSymbol() && root->right->value->isSymbol())
+	if (root->value->isSymbol() && root->right != nullptr && root->right->value->isSymbol())
 		if (root->value->priority() > root->right->value->priority())
 		{
-			std::shared_ptr<Node> newRoot{ copy(root->right) };
-			newRoot->parent.reset();//improve
+			std::shared_ptr<Node> newRoot{ std::make_shared<Node>(*copy(root->right)) };
 			root->right.reset();
 			std::shared_ptr<Node> newLeft{ std::make_shared<Node>(*copy(root)) };
 			std::shared_ptr<Node> newRight{ std::make_shared<Node>(*copy(root)) };
-
+			root.reset();
 			newLeft->right = copy(newRoot->left);
 			newRoot->left.reset();
-
 			newRight->right = copy(newRoot->right);
 			newRoot->right.reset();
-
 			newRoot->left = newLeft;
 			newRoot->right = newRight;
-			this->root = newRoot;
+			root = copy(newRoot);
 		}
-
+	simplify(root->left);
+	simplify(root->right);
 }
