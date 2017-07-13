@@ -31,7 +31,6 @@ int main()
 		{
 			std::clog << "Unknown exception.\n";
 		}
-	}
-	system("pause");
+    }
 	return 0;
 }

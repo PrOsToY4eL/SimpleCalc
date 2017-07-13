@@ -2,7 +2,7 @@
 void Expression::parse()
 {
 	if (inputExpression.find("quit") != std::string::npos)
-		throw Quit{};
+        throw Exit{};
 	while (inputExpression.find(' ') != std::string::npos)
 		inputExpression.erase(inputExpression.find(' '), 1);
 	std::string tempString{};
